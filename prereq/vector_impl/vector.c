@@ -66,6 +66,13 @@ void vector_free(vector* vec)
     vec = NULL;
 }
 
+
+int is_empty(vector* vec)
+{
+    return vec->_size;
+}
+
+
 int main()
 {
     int N = 10;
