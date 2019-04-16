@@ -1,3 +1,10 @@
+/*
+    Hash table implementation where the keys are strings.
+
+    Author: Donald Kruse 2019
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -8,7 +15,9 @@
 
 
 // get a prime: https://www.bigprimes.net/archive/prime/8/
-#define PRIME 5477
+#define PRIME1 5477
+#define PRIME2 1949
+
 
 // alphabet size is the base
 #define BASE 256
@@ -55,6 +64,7 @@ hash_fold_div(const char* key, unsigned m)
         //printf("\n");
     }
 
+    // this code below seems like garbage...
     //printf("sum before last for-loop: %ld\n", sum);
     /*
     for (int k = 0; k < intlength*4; k++)
@@ -64,19 +74,7 @@ hash_fold_div(const char* key, unsigned m)
     }
     */
     //printf("sum after last for-loop: %ld\n", sum);
-    return abs(sum) % PRIME;
-}
-
-
-char lower(char val)
-{
-    return 0xF & val;
-}
-
-
-char upper(char val)
-{
-    return val >> 4;
+    return abs(sum) % m;
 }
 
 
@@ -90,16 +88,79 @@ void get_random_str(char* str, int length)
        str[i] = c;
     }
 }
-    
+
+
+struct tableslot {
+    char* name;
+    int value;
+    struct tableslot* next;
+};
+
+typedef struct tableslot tableslot;
+
+struct hashtable
+{
+    int isfull;
+    int size;
+    tableslot** table;     
+};
+typedef struct hashtable hashtable;
+
+hashtable* create_hashtable(int tablesize)
+{
+    hashtable* ht = malloc(sizeof(hashtable));
+    ht->size = tablesize;
+    ht->table = calloc(tablesize, sizeof(tableslot*) );
+    int i;
+    for (i = 0; i < tablesize; i++)
+        ht->table[i] = NULL;
+    ht->isfull = 0;
+    return ht;
+}
+
+
+tableslot* create_slot(char* nameval, int val)
+{
+    tableslot* slot = malloc(sizeof(tableslot));
+    slot->name = nameval;
+    slot->value = val;
+    slot->next = NULL;
+    return slot;
+}
+
+
+void delete_slot_list(tableslot* head)
+{
+    tableslot* tmp = NULL;
+    while (head)
+    {
+       tmp = head;
+       head = head->next;
+       free(tmp);
+    }
+    head = NULL;
+}
+
+void delete_hashtable(hashtable* ht)
+{
+    int i;
+    for (i = 0; i < ht->size; i++)
+        delete_slot_list(ht->table[i]);
+    free(ht->table);
+    free(ht);
+    ht = NULL;
+}
+
+
 int main()
 {
-    int table4[PRIME]; // counts the nuber of collisions - 1 of the hash;
-    int table8[PRIME]; // counts the nuber of collisions - 1 of the hash;
-    int table16[PRIME]; // counts the nuber of collisions - 1 of the hash;
-    int table32[PRIME]; // counts the nuber of collisions - 1 of the hash;
+    int table4[PRIME2]; // counts the nuber of collisions - 1 of the hash;
+    int table8[PRIME2]; // counts the nuber of collisions - 1 of the hash;
+    int table16[PRIME2]; // counts the nuber of collisions - 1 of the hash;
+    int table32[PRIME2]; // counts the nuber of collisions - 1 of the hash;
     int i;
     // init the tables to zero
-    for(i = 0; i < PRIME; i++) 
+    for(i = 0; i < PRIME2; i++) 
     {
         table4[i] = 0;
         table8[i] = 0;
@@ -119,12 +180,37 @@ int main()
     for (i = 0; i < 1000; i++)
     {
         get_random_str(str4, 4);
-        table4[hash_fold_div(str4, PRIME)]++;
+        table4[hash_fold_div(str4, PRIME2)]++;
         //printf("i = %d: h(%s) = %u\n", i, str4, hash_fold_div(str4, PRIME));
     }
-    for (i = 0; i < PRIME; i++)
-        printf("%d %u\n", i, table4[i]);
+    // save data
+    FILE* fi;
+    char* finame4 = "testTable4.txt";
+    fi = fopen(finame4,"w");
+    if (!fi)
+    {
+        printf("could not open %s\n", finame4);
+        exit(-1);
+    }
+    for (i = 0; i < PRIME2; i++)
+        fprintf(fi, "%d %u\n", i, table4[i]);
 
+    fclose(fi);
+    free(str4);
+    free(str8);
+    free(str16);
+    free(str32);   
+
+    // create hash table
+    printf("testing hash table...\n");
+    int name2age_size = 37;
+    hashtable* ht_name2age = create_hashtable(name2age_size);
+    for (i = 0; i < 37; i++)
+        printf("ht_name2age->table[%d] = %d\n", i, ht_name2age->table[i]);
+
+    ht_name2age->table[0] = create_slot("Bill", 42);
+    ht_name2age->table[0]->next = create_slot("Ted", 23);
+    delete_hashtable(ht_name2age);
+    
     return 0;    
 }
-
