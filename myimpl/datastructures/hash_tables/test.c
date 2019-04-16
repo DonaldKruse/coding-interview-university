@@ -58,10 +58,15 @@ int main()
     struct table* tb = malloc(sizeof(struct table));
     printf("sizeof(table) = %d\n", sizeof(struct table));
     tb->size = SIZE;
-    tb->nodearray = malloc(SIZE*sizeof(struct node*));
+    //tb->nodearray = malloc(SIZE*sizeof(struct node*));
+    tb->nodearray = calloc(SIZE, sizeof(struct node*));
     printf("sizeof(node*) = %d\n", sizeof(struct node*));
     printf("sizeof(node) = %d\n", sizeof(struct node));
     int i;
+    for (i = 0; i < SIZE; i++)
+    {
+        printf("tb->nodearray[%d] = %d\n", i, tb->nodearray[i]);
+    }
     const char* key = "test";
     for (i = 0; i < SIZE; i++)
     {
