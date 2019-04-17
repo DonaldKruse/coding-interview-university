@@ -11,25 +11,8 @@
 #include <limits.h>
 #include <string.h>
 #include <time.h>
+#include "hashtable.h"
 
-
-
-// get a prime: https://www.bigprimes.net/archive/prime/8/
-#define PRIME1 5477
-#define PRIME2 1949
-
-
-// alphabet size is the base
-#define BASE 256
-
-
-/* prints n chars on a single line with no newline at the end. */
-void printn(int n, char c)
-{
-    int i;
-    for (i = 0; i < n; i++)
-        printf("%c",c);
-}
 
 
 /*
@@ -57,7 +40,7 @@ hash_fold_div(const char* key, unsigned m)
         for (k = j*4; k < j*4 + 4; k++)
         {
             sum += key[k] * mult;
-            mult *= BASE;
+            mult *= ASCII_BASE_256;
             //printf("%c", key[k]);
         }
         mult = 1;
@@ -78,6 +61,7 @@ hash_fold_div(const char* key, unsigned m)
 }
 
 
+/* attempts to assign random character string to str */
 void get_random_str(char* str, int length)
 {
     char c;
@@ -90,22 +74,10 @@ void get_random_str(char* str, int length)
 }
 
 
-struct tableslot {
-    char* name;
-    int value;
-    struct tableslot* next;
-};
-
-typedef struct tableslot tableslot;
-
-struct hashtable
-{
-    int isfull;
-    int size;
-    tableslot** table;     
-};
-typedef struct hashtable hashtable;
-
+/*
+    Creates the space needed for a hashtable with
+    an array of pointers to NULL linked lists.
+*/
 hashtable* create_hashtable(int tablesize)
 {
     hashtable* ht = malloc(sizeof(hashtable));
@@ -119,6 +91,10 @@ hashtable* create_hashtable(int tablesize)
 }
 
 
+/* 
+   Deletes a single node in a linked list of type tableslot.
+   Used by delete_slot_list()
+*/
 tableslot* create_slot(char* nameval, int val)
 {
     tableslot* slot = malloc(sizeof(tableslot));
@@ -129,6 +105,7 @@ tableslot* create_slot(char* nameval, int val)
 }
 
 
+/* Deletes a linked list of type tableslot. Used by delete_hashtable() */
 void delete_slot_list(tableslot* head)
 {
     tableslot* tmp = NULL;
@@ -141,6 +118,8 @@ void delete_slot_list(tableslot* head)
     head = NULL;
 }
 
+
+/* Deletes an entire hashtable and all of its linked-lists */
 void delete_hashtable(hashtable* ht)
 {
     int i;
@@ -152,65 +131,10 @@ void delete_hashtable(hashtable* ht)
 }
 
 
-int main()
+/* prints n chars on a single line with no newline at the end. */
+void printn(int n, char c)
 {
-    int table4[PRIME2]; // counts the nuber of collisions - 1 of the hash;
-    int table8[PRIME2]; // counts the nuber of collisions - 1 of the hash;
-    int table16[PRIME2]; // counts the nuber of collisions - 1 of the hash;
-    int table32[PRIME2]; // counts the nuber of collisions - 1 of the hash;
     int i;
-    // init the tables to zero
-    for(i = 0; i < PRIME2; i++) 
-    {
-        table4[i] = 0;
-        table8[i] = 0;
-        table16[i] = 0;
-        table32[i] = 0;
-    }
-    char* str4 = calloc(5, sizeof(char));
-    char* str8 = calloc(9, sizeof(char));
-    char* str16 = calloc(17, sizeof(char));
-    char* str32 = calloc(33, sizeof(char));
-
-    // seed rand()
-    unsigned int seed = time(NULL);
-    srand(seed);
-   
-    // test hashing function
-    for (i = 0; i < 1000; i++)
-    {
-        get_random_str(str4, 4);
-        table4[hash_fold_div(str4, PRIME2)]++;
-        //printf("i = %d: h(%s) = %u\n", i, str4, hash_fold_div(str4, PRIME));
-    }
-    // save data
-    FILE* fi;
-    char* finame4 = "testTable4.txt";
-    fi = fopen(finame4,"w");
-    if (!fi)
-    {
-        printf("could not open %s\n", finame4);
-        exit(-1);
-    }
-    for (i = 0; i < PRIME2; i++)
-        fprintf(fi, "%d %u\n", i, table4[i]);
-
-    fclose(fi);
-    free(str4);
-    free(str8);
-    free(str16);
-    free(str32);   
-
-    // create hash table
-    printf("testing hash table...\n");
-    int name2age_size = 37;
-    hashtable* ht_name2age = create_hashtable(name2age_size);
-    for (i = 0; i < 37; i++)
-        printf("ht_name2age->table[%d] = %d\n", i, ht_name2age->table[i]);
-
-    ht_name2age->table[0] = create_slot("Bill", 42);
-    ht_name2age->table[0]->next = create_slot("Ted", 23);
-    delete_hashtable(ht_name2age);
-    
-    return 0;    
+    for (i = 0; i < n; i++)
+        printf("%c",c);
 }
