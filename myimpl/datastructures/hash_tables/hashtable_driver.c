@@ -67,14 +67,40 @@ int main()
 
     // create hash table
     printf("testing hash table...\n");
-    int name2age_size = 37;
+    const int name2age_size = 37;
     hashtable* ht_name2age = create_hashtable(name2age_size);
     for (i = 0; i < 37; i++)
         printf("ht_name2age->table[%d] = %d\n", i, ht_name2age->table[i]);
 
-    ht_name2age->table[0] = create_slot("Bill", 42);
-    ht_name2age->table[0]->next = create_slot("Ted", 23);
+    const char* namelist[3] = {"Bill", "Ted", "Jim"};
+    const int agelist[3]    = {49,      12,     20};
+    printf("\n");
+    printf("insert 3 times...\n");
+    for (i = 0; i < 3; i++)
+        insert(ht_name2age, namelist[i], agelist[i]);
+
+    printf("print the first entries in the table...\n");
+    for (i = 0; i < 37; i++)
+    {
+        if (ht_name2age->table[i])
+            printf("k = %d: %s is %d years old\n", i, ht_name2age->table[i]->name, ht_name2age->table[i]->value);
+        else
+            printf("k = %d: NUll\n", i);
+    }
+
+    printf("\nCheck if the entries exist\n");
+    for (i = 0; i < 3; i++)
+    {
+        if (exists(ht_name2age, namelist[i]))
+            printf("%s exists in the table!\n", namelist[i]);
+        else
+            printf("%s DOES NOT exists in the table!\n", namelist[i]);
+    }
+
+    printf("\nGet value of the entries\n");
+    for (i = 0; i < 3; i++)
+        printf("%s gets the value %d\n", namelist[i], get_val(ht_name2age, namelist[i]));
+
     delete_hashtable(ht_name2age);
-    
     return 0;    
 }

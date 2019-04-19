@@ -26,7 +26,7 @@
 
 /* Hashtable data structures */
 struct tableslot {
-    char* name;
+    const char* name;
     int value;
     struct tableslot* next;
 };
@@ -46,12 +46,15 @@ void get_random_str(char* str, int length);
 
 /* Hashtable utilities */
 hashtable* create_hashtable(int tablesize);
-tableslot* create_slot(char* nameval, int val);
+tableslot* create_slot(const char* nameval, int val);
 void delete_slot_list(tableslot* head);
 void delete_hashtable(hashtable* ht);
-int exist(hashtable* ht, const char* key);
-int get_val(hashtable* ht, const char* key);
-// TODO: Search through linked list for key
+int exist(hashtable* ht, const char* name);
+int get_val(hashtable* ht, const char* name);
+tableslot* search_tableslot_list(tableslot* ts_head, const char* name);
+void insert(hashtable* ht, const char* name, int age);
+void append(tableslot* ts_head, const char* name, int age);
+
 
 /* Other utilities */
 void printn(int n, char c);

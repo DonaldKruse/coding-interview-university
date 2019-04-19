@@ -12,7 +12,7 @@
 #include <string.h>
 #include <time.h>
 #include "hashtable.h"
-
+#include <assert.h>
 
 
 /*
@@ -95,7 +95,7 @@ hashtable* create_hashtable(int tablesize)
    Deletes a single node in a linked list of type tableslot.
    Used by delete_slot_list()
 */
-tableslot* create_slot(char* nameval, int val)
+tableslot* create_slot(const char* nameval, int val)
 {
     tableslot* slot = malloc(sizeof(tableslot));
     slot->name = nameval;
@@ -132,29 +132,75 @@ void delete_hashtable(hashtable* ht)
 
 
 /* check if a key-value pair exists */
-int exists(hashtable* ht, const char* key)
+int exists(hashtable* ht, const char* name)
 {
-    unsigned k = hash_fold_div(key, ht->size);
+    unsigned key = hash_fold_div(name, ht->size);
 
     /* return true if not null, false if null */
-    return (ht->table[k] != NULL);
+    assert(key < ht->size);
+    if (search_tableslot_list(ht->table[key], name))
+      return 1;
+    else
+      return 0;
 }
 
 
 /* gets the value corresponding to `key`..
  * Returns 0 if it does not exist.
  */
-int get_val(hashtable* ht, const char* key)
+int get_val(hashtable* ht, const char* name)
 {
     int ret_val = 0;
-    if ( exists(ht, key) )
+    int key = hash_fold_div(name, ht->size);
+    if ( !exists(ht, name) )
         return ret_val;  // is zero
-    int k = hash_fold_div(key, ht->size);
-    return ht->table[k]->value;
+    assert(key < ht->size);
+    tableslot* ts = search_tableslot_list(ht->table[key], name);
+    if (ts)
+      return ts->value;
+    return 0;
 }
 
 
-// TODO: Search through linked-list for key
+/* Returns a pointer to the slot in a list with corresponding unhashed key `name` */
+tableslot* search_tableslot_list(tableslot* ts_head, const char* name)
+{
+    tableslot* tmp = ts_head;
+    int cmpval;
+    while (tmp)
+    {
+        cmpval = strcmp(name, tmp->name);
+        if (cmpval == 0) // they are equal
+            return tmp;
+        tmp = tmp->next;
+    }
+    return NULL;
+}
+
+
+void insert(hashtable* ht, const char* name, int age)
+{
+    unsigned key = hash_fold_div(name, ht->size);
+    assert(key < ht->size);
+    if (ht->table[key] == NULL)
+      ht->table[key] = create_slot(name, age);
+    else
+        append(ht->table[key], name, age);
+}
+
+
+void append(tableslot* ts_head, const char* name, int age)
+{
+    assert(ts_head);
+    tableslot* tmp = ts_head;
+    tableslot* end = create_slot(name, age);
+    while (tmp->next)
+      tmp = tmp->next;
+    assert(tmp->next == NULL);
+    tmp->next = end;
+}
+      
+
 /* prints n chars on a single line with no newline at the end. */
 void printn(int n, char c)
 {
