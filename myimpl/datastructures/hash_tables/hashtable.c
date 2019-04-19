@@ -131,6 +131,30 @@ void delete_hashtable(hashtable* ht)
 }
 
 
+/* check if a key-value pair exists */
+int exists(hashtable* ht, const char* key)
+{
+    unsigned k = hash_fold_div(key, ht->size);
+
+    /* return true if not null, false if null */
+    return (ht->table[k] != NULL);
+}
+
+
+/* gets the value corresponding to `key`..
+ * Returns 0 if it does not exist.
+ */
+int get_val(hashtable* ht, const char* key)
+{
+    int ret_val = 0;
+    if ( exists(ht, key) )
+        return ret_val;  // is zero
+    int k = hash_fold_div(key, ht->size);
+    return ht->table[k]->value;
+}
+
+
+// TODO: Search through linked-list for key
 /* prints n chars on a single line with no newline at the end. */
 void printn(int n, char c)
 {

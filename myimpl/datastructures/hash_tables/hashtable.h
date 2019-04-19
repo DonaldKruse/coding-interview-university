@@ -49,7 +49,9 @@ hashtable* create_hashtable(int tablesize);
 tableslot* create_slot(char* nameval, int val);
 void delete_slot_list(tableslot* head);
 void delete_hashtable(hashtable* ht);
-
+int exist(hashtable* ht, const char* key);
+int get_val(hashtable* ht, const char* key);
+// TODO: Search through linked list for key
 
 /* Other utilities */
 void printn(int n, char c);
