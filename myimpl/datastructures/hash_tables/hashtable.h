@@ -56,7 +56,7 @@ void insert(hashtable* ht, const char* name, int age);
 void append(tableslot* ts_head, const char* name, int age);
 void remove_from_list(tableslot** ts_head_ref, const char* name);
 void remove_item(hashtable* ht, const char* name);
-
+void print_hashtable(hashtable* ht);
 
 /* Other utilities */
 void printn(int n, char c);

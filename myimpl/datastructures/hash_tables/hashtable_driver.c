@@ -113,6 +113,19 @@ int main()
         else
             printf("%s DOES NOT exists in the table!\n", namelist[i]);
     }
+    
+    print_hashtable(ht_name2age);
+    printf("put bill back\n");
+    insert(ht_name2age, namelist[0], agelist[0]);
+    print_hashtable(ht_name2age);
+    remove_item(ht_name2age, "Ted");
+    print_hashtable(ht_name2age);
+    const char * donny = "Donald Adam Kruse";
+    int donnyage = 28;
+    insert(ht_name2age, donny, donnyage);
+    insert(ht_name2age, "beth rammage", 24);
+    print_hashtable(ht_name2age);
+    printf("\n");
 
 
     delete_hashtable(ht_name2age);

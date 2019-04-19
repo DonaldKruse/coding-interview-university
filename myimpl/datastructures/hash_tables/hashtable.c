@@ -249,6 +249,26 @@ void remove_item(hashtable* ht, const char* name)
 }
 
 
+void print_hashtable(hashtable* ht)
+{
+    int i;
+    tableslot* tmp = NULL;
+    for (i = 0; i < ht->size; i++)
+    {
+        if (ht->table[i] == NULL)
+        {
+            printf("key = %d:    NULL\n", i);
+            continue;
+        }
+        printf("key = %d:\n", i);
+        tmp = ht->table[i];
+        while (tmp)
+        {
+           printf("    %s : %d\n", tmp->name, tmp->value);
+           tmp = tmp->next;
+        }
+    }
+}
 
 /* prints n chars on a single line with no newline at the end. */
 void printn(int n, char c)
