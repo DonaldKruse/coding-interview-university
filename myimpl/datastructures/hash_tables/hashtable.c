@@ -189,6 +189,9 @@ void insert(hashtable* ht, const char* name, int age)
 }
 
 
+/*
+ *  Appends slot to the end of a list.
+ */
 void append(tableslot* ts_head, const char* name, int age)
 {
     assert(ts_head);
@@ -200,6 +203,52 @@ void append(tableslot* ts_head, const char* name, int age)
     tmp->next = end;
 }
       
+
+
+/* searches and removes an item from a list if found */
+void remove_from_list(tableslot** ts_head_ref, const char* name)
+{
+    tableslot* head = *ts_head_ref;
+    tableslot* tmp = head;
+    tableslot* prev = NULL;
+    int cmpval;  // for string comparison
+    
+    // check if head is the item
+    cmpval = strcmp(tmp->name, name);
+    if (cmpval == 0) // equality
+    {
+        *ts_head_ref = tmp->next;
+        free(tmp);
+        return;
+    }
+
+    // search for item
+    while (tmp && (cmpval = strcmp(tmp->name, name) != 0) )
+    {
+        prev = tmp;
+        tmp = tmp->next;
+    }
+    
+    // not found
+    if (tmp == NULL)
+      return;
+    
+    // found
+    prev->next = tmp->next;
+    free(tmp);
+}
+        
+/*
+ * remove an item from the hashtable if it exisits..
+ */
+void remove_item(hashtable* ht, const char* name)
+{
+    unsigned key = hash_fold_div(name, ht->size);
+    assert(key < ht->size);
+    remove_from_list(&(ht->table[key]), name);
+}
+
+
 
 /* prints n chars on a single line with no newline at the end. */
 void printn(int n, char c)

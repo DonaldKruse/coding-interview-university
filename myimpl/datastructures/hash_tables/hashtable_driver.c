@@ -100,6 +100,20 @@ int main()
     printf("\nGet value of the entries\n");
     for (i = 0; i < 3; i++)
         printf("%s gets the value %d\n", namelist[i], get_val(ht_name2age, namelist[i]));
+    
+    printf("\nRemove an item\n");
+    printf("Removing 'Bill'\n");
+    remove_item(ht_name2age, namelist[0]);
+
+    printf("\nCheck if the entries exist\n");
+    for (i = 0; i < 3; i++)
+    {
+        if (exists(ht_name2age, namelist[i]))
+            printf("%s exists in the table!\n", namelist[i]);
+        else
+            printf("%s DOES NOT exists in the table!\n", namelist[i]);
+    }
+
 
     delete_hashtable(ht_name2age);
     return 0;    
